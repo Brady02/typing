@@ -13,6 +13,7 @@ export default function TypingWindow() {
     const inputRef = useRef(null);
     const [correct, setCorrect] = useState(0);
     const [inCorrect, setInCorrect] = useState(0);
+    const [timeTaken, setTimeTaken] = useState(0);
 
     //add keydown event for backspacing and restarting with enter
 
@@ -41,6 +42,16 @@ export default function TypingWindow() {
     };
 
     //add useeffect hook to make time tracking loop and check when run is over
+    useEffect(() => {
+        let interval;
+        if (isTyping) {
+            interval = setInterval(() => {
+                setTimeTaken(timeTaken + 1);
+            }, 1000) //runs every second
+        }
+    });
+
+    //make mode changer a function that resets everything when you change mode
 
     return (
         <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
