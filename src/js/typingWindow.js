@@ -19,12 +19,14 @@ export default function TypingWindow() {
     const [correct, setCorrect] = useState(0);
     const [inCorrect, setInCorrect] = useState(0);
     const [timeTaken, setTimeTaken] = useState(0);
+    const [testComplete, setTestComplete] = useState(false);
 
     //handles typing and checks accuracy
     //add setting so if currchar is a space insert letters until they press space
     //add keydown event for backspacing and restarting with enter
     const handleKeyDown = (event) => {
         let typedChar = event.key;
+        console.log(typedChar);
         const chars = document.querySelectorAll('.char');
         //let typedChar = event.target.value;
         if (charIndex < chars.length) {
@@ -32,11 +34,13 @@ export default function TypingWindow() {
             if (!isTyping) {
                 setIsTyping(true);
             }
-            if (typedChar === 'Backspace' && charIndex > 0) {
-                if (chars[charIndex-1].classList.contains('text-lime-500')) {
+            if (typedChar === 'Backspace') {
+                if (charIndex === 0) {
+
+                } else if (chars[charIndex-1].classList.contains('text-lime-500') && charIndex > 0) {
                     chars[charIndex-1].classList.remove('text-lime-500');
                     setCharIndex(charIndex - 1);
-                } else {
+                } else if (chars[charIndex-1].classList.contains('text-rose-600') && charIndex > 0) {
                     chars[charIndex-1].classList.remove('text-rose-600');
                     setCharIndex(charIndex - 1);
                 }
@@ -54,6 +58,7 @@ export default function TypingWindow() {
         }
         else {
             setIsTyping(false);
+            setTestComplete(true);
         } 
     }
 
@@ -71,12 +76,14 @@ export default function TypingWindow() {
         setCorrect(0);
         setInCorrect(0);
         setTimeTaken(0);
+        setTestComplete(false);
         //make cursor tracker to make carot and reset it here
     }
     
     //add useeffect hook to make time tracking loop and check when run is over
     useEffect(() => {
         let interval;
+        console.log(isTyping);
         if (isTyping) {
             interval = setInterval(() => {
                 setTimeTaken(timeTaken + 1);
@@ -85,33 +92,40 @@ export default function TypingWindow() {
     });
 
     //make mode changer a function that resets everything when you change mode
-
-    return (
-        <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
-                <div className='flex space-x-4 border-2 border-red-400'>
-                    {modes.map(mode => (
-                        <button className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(mode)}}>
-                            {mode}
-                        </button>
-            ))}
-        </div>
-
-        <div className='flex-initial max-w-5xl border-2 border-red-300' onClick = {() => {inputRef.current.focus()}}>
-            {Array.from(text).map((letter,index) => (
-                <span
-                key = {index}
-                className = {`char ${index === 0 ? 'active': ''}`}
-                >
-                    {letter}
-                </span>
-            ))}
-            <input type='text' ref = {inputRef} id = 'inputF' value = {inputValue} onKeyDown = {handleKeyDown} autoFocus className = 'absolute opacity-0 z-0 w-0' />
-        </div>
-
-            <div className='border-2 border-red-300'>
-
+    if (!testComplete) {
+        return (
+            <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
+                    <div className='flex space-x-4 border-2 border-red-400'>
+                        {modes.map(mode => (
+                            <button className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(mode)}}>
+                                {mode}
+                            </button>
+                ))}
             </div>
-        </div>
-        
-    );
+
+            <div className='flex-initial max-w-5xl border-2 border-red-300' onClick = {() => {inputRef.current.focus()}}>
+                {Array.from(text).map((letter,index) => (
+                    <span
+                    key = {index}
+                    className = {`char ${index === 0 ? 'active': ''}`}
+                    >
+                        {letter}
+                    </span>
+                ))}
+                <input type='text' ref = {inputRef} id = 'inputF' value = {inputValue} onKeyDown = {handleKeyDown} autoFocus className = 'absolute opacity-0 z-0 w-0' />
+            </div>
+
+                <div className='border-2 border-red-300'>
+
+                </div>
+            </div>
+            
+        );
+    } else {
+        return (
+            <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
+                <p>test complete wpm: {isTyping}</p>
+            </div>
+        );
+    }
 };
