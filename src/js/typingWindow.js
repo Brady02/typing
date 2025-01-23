@@ -15,18 +15,27 @@ export default function TypingWindow() {
     const [inCorrect, setInCorrect] = useState(0);
     const [timeTaken, setTimeTaken] = useState(0);
 
-    //add keydown event for backspacing and restarting with enter
-
     //handles typing and checks accuracy
-    const handleTyping = (event) => {
+    //add setting so if currchar is a space insert letters until they press space
+    //add keydown event for backspacing and restarting with enter
+    const handleKeyDown = (event) => {
+        let typedChar = event.key;
         const chars = document.querySelectorAll('.char');
-        let typedChar = event.target.value;
+        //let typedChar = event.target.value;
         if (charIndex < chars.length) {
             let currChar = chars[charIndex].innerText;
             if (!isTyping) {
                 setIsTyping(true);
             }
-            if (typedChar === currChar) {
+            if (typedChar === 'Backspace' && charIndex > 0) {
+                if (chars[charIndex-1].classList.contains('text-lime-500')) {
+                    chars[charIndex-1].classList.remove('text-lime-500');
+                    setCharIndex(charIndex - 1);
+                } else {
+                    chars[charIndex-1].classList.remove('text-rose-600');
+                    setCharIndex(charIndex - 1);
+                }
+            } else if (typedChar === currChar) {
                 setCorrect(correct + 1)
                 chars[charIndex].classList.add('text-lime-500');
                 setCharIndex(charIndex + 1);
@@ -39,7 +48,7 @@ export default function TypingWindow() {
         else {
             setIsTyping(false);
         } 
-    };
+    }
 
     //add useeffect hook to make time tracking loop and check when run is over
     useEffect(() => {
@@ -57,7 +66,7 @@ export default function TypingWindow() {
         <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
                 <div className='flex space-x-4 border-2 border-red-400'>
                     {modes.map(mode => (
-                        <button className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {setActive(mode); setCurrMode(mode); setText(generate(mode).join(' '))} }>
+                        <button className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {setActive(mode); setCurrMode(mode); setText(generate(mode).join(' '))}}>
                             {mode}
                         </button>
             ))}
@@ -72,7 +81,7 @@ export default function TypingWindow() {
                     {letter}
                 </span>
             ))}
-            <input type='text' ref = {inputRef} id = 'inputF' value = {inputValue} onChange = {handleTyping} autoFocus className = 'absolute opacity-0 z-0 w-0' />
+            <input type='text' ref = {inputRef} id = 'inputF' value = {inputValue} onKeyDown = {handleKeyDown} autoFocus className = 'absolute opacity-0 z-0 w-0' />
         </div>
 
             <div className='border-2 border-red-300'>
