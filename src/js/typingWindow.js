@@ -17,6 +17,7 @@ export default function TypingWindow() {
     const [isTyping, setIsTyping] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const inputRef = useRef(null);
+    const finInputRef = useRef(null);
     const [correct, setCorrect] = useState(0);
     const [inCorrect, setInCorrect] = useState(0);
     const [timeTaken, setTimeTaken] = useState(0);
@@ -56,6 +57,10 @@ export default function TypingWindow() {
                 chars[charIndex].classList.add('text-rose-600')
                 setCharIndex(charIndex + 1);
             }
+            if (charIndex === chars.length - 1 && typedChar != 'Backspace') {
+                setIsTyping(false);
+                setTestComplete(true);
+            }
         }
         else {
             setIsTyping(false);
@@ -63,23 +68,37 @@ export default function TypingWindow() {
         } 
     }
 
+    //checks reset inputs for finished test page, will add more hotkeys ex replay same words
+    const handleFinishInput = (event) => {
+        let key = event.key;
+        console.log(key);        
+        if (key === 'Enter') {
+            
+            changeMode(currMode);
+        }
+    }
+
     //make some css to combine these strapped tailwind classes into bigger combined so they are easier to handle (only for modified ones)
     const changeMode = (mode) => {
-        const charsClear = document.querySelectorAll('.char');
-        for (let i = 0; i < charIndex; i++) {
-            if (charsClear[i].classList.contains('text-lime-500')) {charsClear[i].classList.remove('text-lime-500');}
-            if (charsClear[i].classList.contains('text-rose-600')) {charsClear[i].classList.remove('text-rose-600');}
+        if (!testComplete) {
+            const charsClear = document.querySelectorAll('.char');
+            for (let i = 0; i < charIndex; i++) {
+                if (charsClear[i].classList.contains('text-lime-500')) {charsClear[i].classList.remove('text-lime-500');}
+                if (charsClear[i].classList.contains('text-rose-600')) {charsClear[i].classList.remove('text-rose-600');}
+            }
+            inputRef.current.focus();
         }
+        setCharIndex(0);
+        setTestComplete(false);
         setActive(mode);
         setCurrMode(mode);
         setText(generate(mode).join(' '));
-        setCharIndex(0);
         setCorrect(0);
         setInCorrect(0);
         setTimeTaken(0);
-        setTestComplete(false);
         //make cursor tracker to make carot and reset it here
     }
+
     
     //add useeffect hook to make time tracking loop and check when run is over
     useEffect(() => {
@@ -119,7 +138,7 @@ export default function TypingWindow() {
                         {letter}
                     </span>
                 ))}
-                <input type='text' ref = {inputRef} id = 'inputF' value = {inputValue} onKeyDown = {handleKeyDown} autoFocus className = 'absolute opacity-0 z-0 w-0' />
+                <input type='text' ref = {inputRef} id = 'inputF' onKeyDown = {handleKeyDown} autoFocus className = 'absolute opacity-0 z-0 w-0' />
             </div>
 
                 <div className='border-2 border-red-300'>
@@ -129,8 +148,10 @@ export default function TypingWindow() {
             
         );
     } else {
+        //when test is over display finished test page
         return (
-            <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
+            <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300' onClick = {() => {finInputRef.current.focus()}}> 
+                <input type='text' ref = {finInputRef} onKeyDown = {handleFinishInput} autoFocus className = 'absolute opacity-0 z-0 w-0'></input>
                 <p>test complete wpm: {(timeTaken*60)/currMode}</p>
             </div>
         );
