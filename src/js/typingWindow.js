@@ -1,3 +1,4 @@
+
 import { generate } from "random-words";
 import { useEffect, useRef, useState } from "react";
 
@@ -86,10 +87,16 @@ export default function TypingWindow() {
         console.log(isTyping);
         if (isTyping) {
             interval = setInterval(() => {
+                console.log("in")
                 setTimeTaken(timeTaken + 1);
             }, 1000) //runs every second
+        } else {
+            clearInterval(interval);
         }
-    });
+        return () => {
+            clearInterval(interval);
+        };
+    },[timeTaken, isTyping])
 
     //make mode changer a function that resets everything when you change mode
     if (!testComplete) {
@@ -124,7 +131,7 @@ export default function TypingWindow() {
     } else {
         return (
             <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
-                <p>test complete wpm: {isTyping}</p>
+                <p>test complete wpm: {(timeTaken*60)/currMode}</p>
             </div>
         );
     }
