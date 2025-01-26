@@ -37,27 +37,33 @@ export default function TypingWindow() {
                 setIsTyping(true);
             }
             if (typedChar === 'Backspace') {
-                if (charIndex === 0) {
-
-                } else if (chars[charIndex-1].classList.contains('text-lime-500') && charIndex > 0) {
-                    chars[charIndex-1].classList.remove('text-lime-500');
-                    setCharIndex(charIndex - 1);
-                } else if (chars[charIndex-1].classList.contains('text-rose-600') && charIndex > 0) {
-                    chars[charIndex-1].classList.remove('text-rose-600');
-                    setCharIndex(charIndex - 1);
+                if (charIndex !== 0) {
+                    chars[charIndex].classList.remove('border-l-4');
+                    chars[charIndex-1].classList.add('border-l-4');
+                    if (chars[charIndex-1].classList.contains('text-lime-500') && charIndex > 0) {
+                        chars[charIndex-1].classList.remove('text-lime-500');
+                        setCharIndex(charIndex - 1);
+                    } else if (chars[charIndex-1].classList.contains('text-rose-600') && charIndex > 0) {
+                        chars[charIndex-1].classList.remove('text-rose-600');
+                        setCharIndex(charIndex - 1);
+                    }
                 }
             } else if (typedChar === 'Enter') {
                 changeMode(currMode);
             } else if (typedChar === currChar) {
+                chars[charIndex].classList.remove('border-l-4');
                 setCorrect(correct + 1)
                 chars[charIndex].classList.add('text-lime-500');
                 setCharIndex(charIndex + 1);
+                if (charIndex < chars.length-1) {chars[charIndex+1].classList.add('border-l-4');}
             } else {
+                chars[charIndex].classList.remove('border-l-4');
                 setInCorrect(inCorrect + 1);
-                chars[charIndex].classList.add('text-rose-600')
+                chars[charIndex].classList.add('text-rose-600');
                 setCharIndex(charIndex + 1);
+                if (charIndex < chars.length-1) {chars[charIndex+1].classList.add('border-l-4');}
             }
-            if (charIndex === chars.length - 1 && typedChar != 'Backspace') {
+            if (charIndex === chars.length - 1 && typedChar !== 'Backspace') {
                 setIsTyping(false);
                 setTestComplete(true);
             }
@@ -152,7 +158,7 @@ export default function TypingWindow() {
         return (
             <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300' onClick = {() => {finInputRef.current.focus()}}> 
                 <input type='text' ref = {finInputRef} onKeyDown = {handleFinishInput} autoFocus className = 'absolute opacity-0 z-0 w-0'></input>
-                <p>test complete wpm: {(timeTaken*60)/currMode}</p>
+                <p>test complete wpm: {currMode/(timeTaken/60)}</p>
             </div>
         );
     }
