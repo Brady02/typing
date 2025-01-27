@@ -25,59 +25,63 @@ export default function TypingWindow() {
 
     //handles typing and checks accuracy
     //add setting so if currchar is a space insert letters until they press space
-    //add keydown event for backspacing and restarting with enter
-    const handleKeyDown = (event) => {
-        let typedChar = event.key;
-        console.log(typedChar);
+    //split keydown and on change to fix shift issue
+    //add buttons to add capitilization and puncuation to sentences (maybe code mode that just adds random bracketing and quotations)
+    const handleChange = (event) => {
+        let typedChar = event.target.value;
         const chars = document.querySelectorAll('.char');
-        //let typedChar = event.target.value;
+        //console.log(test)
         if (charIndex < chars.length) {
             let currChar = chars[charIndex].innerText;
             if (!isTyping) {
                 setIsTyping(true);
             }
-            if (typedChar === 'Backspace') {
-                if (charIndex !== 0) {
-                    chars[charIndex].classList.remove('border-l-4');
-                    chars[charIndex-1].classList.add('border-l-4');
-                    if (chars[charIndex-1].classList.contains('text-lime-500') && charIndex > 0) {
-                        chars[charIndex-1].classList.remove('text-lime-500');
-                        setCharIndex(charIndex - 1);
-                    } else if (chars[charIndex-1].classList.contains('text-rose-600') && charIndex > 0) {
-                        chars[charIndex-1].classList.remove('text-rose-600');
-                        setCharIndex(charIndex - 1);
-                    }
-                }
-            } else if (typedChar === 'Enter') {
-                changeMode(currMode);
-            } else if (typedChar === currChar) {
+
+            if (typedChar === currChar) {
                 chars[charIndex].classList.remove('border-l-4');
                 setCorrect(correct + 1)
                 chars[charIndex].classList.add('text-lime-500');
                 setCharIndex(charIndex + 1);
                 if (charIndex < chars.length-1) {chars[charIndex+1].classList.add('border-l-4');}
-            } else {
+            } else if (typedChar !== currChar) {
                 chars[charIndex].classList.remove('border-l-4');
                 setInCorrect(inCorrect + 1);
                 chars[charIndex].classList.add('text-rose-600');
                 setCharIndex(charIndex + 1);
                 if (charIndex < chars.length-1) {chars[charIndex+1].classList.add('border-l-4');}
             }
+
             if (charIndex === chars.length - 1 && typedChar !== 'Backspace') {
                 setIsTyping(false);
                 setTestComplete(true);
             }
         }
-        else {
-            setIsTyping(false);
-            setTestComplete(true);
-        } 
+    }
+
+    const handleKeyDown = (event) => {
+        let keyDown = event.key;
+        const chars = document.querySelectorAll('.char');
+        //let typedChar = event.key;
+        if (charIndex < chars.length) {
+            if (keyDown === 'Backspace' && charIndex !== 0) {
+                chars[charIndex].classList.remove('border-l-4');
+                chars[charIndex-1].classList.add('border-l-4');
+                if (chars[charIndex-1].classList.contains('text-lime-500') && charIndex > 0) {
+                    chars[charIndex-1].classList.remove('text-lime-500');
+                    setCharIndex(charIndex - 1);
+                } else if (chars[charIndex-1].classList.contains('text-rose-600') && charIndex > 0) {
+                    chars[charIndex-1].classList.remove('text-rose-600');
+                    setCharIndex(charIndex - 1);
+                }
+            } else if (keyDown === 'Enter') {
+                changeMode(currMode);
+            } 
+        }
     }
 
     //checks reset inputs for finished test page, will add more hotkeys ex replay same words
     const handleFinishInput = (event) => {
         let key = event.key;
-        console.log(key);        
         if (key === 'Enter') {
             
             changeMode(currMode);
@@ -88,6 +92,7 @@ export default function TypingWindow() {
     const changeMode = (mode) => {
         if (!testComplete) {
             const charsClear = document.querySelectorAll('.char');
+            charsClear[charIndex].classList.remove('border-l-4')
             for (let i = 0; i < charIndex; i++) {
                 if (charsClear[i].classList.contains('text-lime-500')) {charsClear[i].classList.remove('text-lime-500');}
                 if (charsClear[i].classList.contains('text-rose-600')) {charsClear[i].classList.remove('text-rose-600');}
@@ -109,10 +114,8 @@ export default function TypingWindow() {
     //add useeffect hook to make time tracking loop and check when run is over
     useEffect(() => {
         let interval;
-        console.log(isTyping);
         if (isTyping) {
             interval = setInterval(() => {
-                console.log("in")
                 setTimeTaken(timeTaken + 1);
             }, 1000) //runs every second
         } else {
@@ -129,7 +132,7 @@ export default function TypingWindow() {
             <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
                     <div className='flex space-x-4 border-2 border-red-400'>
                         {modes.map(mode => (
-                            <button className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(mode)}}>
+                            <button key = {mode} className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(mode)}}>
                                 {mode}
                             </button>
                 ))}
@@ -144,7 +147,7 @@ export default function TypingWindow() {
                         {letter}
                     </span>
                 ))}
-                <input type='text' ref = {inputRef} id = 'inputF' onKeyDown = {handleKeyDown} autoFocus className = 'absolute opacity-0 z-0 w-0' />
+                <input type='text' ref = {inputRef} id = 'inputF' value = {inputValue} onChange = {handleChange} onKeyDown = {handleKeyDown} autoFocus className = 'absolute opacity-0 z-0 w-0' />
             </div>
 
                 <div className='border-2 border-red-300'>
@@ -158,7 +161,7 @@ export default function TypingWindow() {
         return (
             <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300' onClick = {() => {finInputRef.current.focus()}}> 
                 <input type='text' ref = {finInputRef} onKeyDown = {handleFinishInput} autoFocus className = 'absolute opacity-0 z-0 w-0'></input>
-                <p>test complete wpm: {currMode/(timeTaken/60)}</p>
+                <p>test complete wpm: {(correct/4.9)/(timeTaken/60)}</p>
             </div>
         );
     }
