@@ -1,6 +1,7 @@
 
 import { generate } from "random-words";
 import { useEffect, useRef, useState } from "react";
+import { generateText } from "./generateText";
 
 //to-do: (outside this current scope)
 //theme changing in different menu
@@ -12,7 +13,6 @@ export default function TypingWindow() {
     const modes = [10, 25, 50, 100];
     const [currMode, setCurrMode] = useState(10);
     const [active, setActive] = useState(modes[0]);
-    const [text, setText] = useState(generate(10).join(' '));
     const [charIndex, setCharIndex] = useState(0);
     const [isTyping, setIsTyping] = useState(false);
     const [inputValue, setInputValue] = useState('');
@@ -22,10 +22,11 @@ export default function TypingWindow() {
     const [inCorrect, setInCorrect] = useState(0);
     const [timeTaken, setTimeTaken] = useState(0);
     const [testComplete, setTestComplete] = useState(false);
+    const [useCapital, setUseCapital] = useState(false);
+    const [text, setText] = useState('');
 
     //handles typing and checks accuracy
     //add setting so if currchar is a space insert letters until they press space
-    //split keydown and on change to fix shift issue
     //add buttons to add capitilization and puncuation to sentences (maybe code mode that just adds random bracketing and quotations)
     const handleChange = (event) => {
         let typedChar = event.target.value;
@@ -103,14 +104,17 @@ export default function TypingWindow() {
         setTestComplete(false);
         setActive(mode);
         setCurrMode(mode);
-        setText(generate(mode).join(' '));
+        setText(generateText(mode, useCapital, false));
         setCorrect(0);
         setInCorrect(0);
         setTimeTaken(0);
         //make cursor tracker to make carot and reset it here
     }
 
-    
+    useEffect(() => {
+        setText(generateText(currMode,useCapital,false));
+    },[]); 
+
     //add useeffect hook to make time tracking loop and check when run is over
     useEffect(() => {
         let interval;
@@ -131,6 +135,7 @@ export default function TypingWindow() {
         return (
             <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
                     <div className='flex space-x-4 border-2 border-red-400'>
+                        <button className = {!useCapital ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {setUseCapital(!useCapital); changeMode(currMode)}}> Capitals </button>
                         {modes.map(mode => (
                             <button key = {mode} className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(mode)}}>
                                 {mode}
