@@ -23,6 +23,7 @@ export default function TypingWindow() {
     const [timeTaken, setTimeTaken] = useState(0);
     const [testComplete, setTestComplete] = useState(false);
     const [useCapital, setUseCapital] = useState(false);
+    const [usePunc, setUsePunc] = useState(false);
     const [text, setText] = useState('');
 
     //handles typing and checks accuracy
@@ -111,9 +112,10 @@ export default function TypingWindow() {
         //make cursor tracker to make carot and reset it here
     }
 
-    useEffect(() => {
-        setText(generateText(currMode,useCapital,false));
-    },[]); 
+    //swap on click text reload for useeffect parameter update run
+    //useEffect(() => {
+    //    setText(generateText(currMode,useCapital,usePunc));
+    //},[]); 
 
     //add useeffect hook to make time tracking loop and check when run is over
     useEffect(() => {
@@ -135,7 +137,8 @@ export default function TypingWindow() {
         return (
             <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
                     <div className='flex space-x-4 border-2 border-red-400'>
-                        <button className = {!useCapital ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {setUseCapital(!useCapital); changeMode(currMode)}}> Capitals </button>
+                        <button className = {usePunc? 'border-2' : 'border-2 border-red-300'} onClick = {() => {setUsePunc(!usePunc); changeMode(currMode)}}> Puncuation </button>
+                        <button className = {useCapital ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {setUseCapital(!useCapital); changeMode(currMode)}}> Capitals </button>
                         {modes.map(mode => (
                             <button key = {mode} className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(mode)}}>
                                 {mode}
