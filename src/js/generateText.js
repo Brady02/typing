@@ -2,7 +2,6 @@
 import { generate } from "random-words";
 export function generateText (currMode, useCapital, usePuncuation) {
     let text = generate(currMode);
-    console.log(text.join(' '))
     let randNum = Math.floor(Math.random() * (currMode * 0.6)) + (currMode * 0.2);
     let randIndex = [];
     if (useCapital) {
@@ -21,10 +20,7 @@ export function generateText (currMode, useCapital, usePuncuation) {
             if (!useCapital) {randIndex[i] = Math.floor(Math.random() * currMode);}
             if (randIndex[i] > 0) {
                 if (randPunc < 3) {
-                    console.log(text.join(" "));
-                    console.log(randIndex[i])
-                    console.log(text[randIndex[i-1]]);
-                    text[randIndex[i-1]] = text[randIndex[i-1]].concat(puncOptions[randPunc]);
+                    text[randIndex[i]-1] = text[randIndex[i]-1].concat(puncOptions[randPunc]);
                 } else if (randPunc > 3) {
                     text[randIndex[i]] = puncOptions[randPunc].concat(text[randIndex[i]], puncOptions[randPunc]);
                 } else if (randIndex[i] < currMode){

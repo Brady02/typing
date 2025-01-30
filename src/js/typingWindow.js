@@ -86,12 +86,12 @@ export default function TypingWindow() {
         let key = event.key;
         if (key === 'Enter') {
             
-            changeMode(currMode);
+            changeMode(currMode, useCapital, usePunc);
         }
     }
 
     //make some css to combine these strapped tailwind classes into bigger combined so they are easier to handle (only for modified ones)
-    const changeMode = (mode) => {
+    const changeMode = (mode, capitals, punctuation) => {
         if (!testComplete) {
             const charsClear = document.querySelectorAll('.char');
             charsClear[charIndex].classList.remove('border-l-4')
@@ -105,17 +105,20 @@ export default function TypingWindow() {
         setTestComplete(false);
         setActive(mode);
         setCurrMode(mode);
-        setText(generateText(mode, useCapital, false));
         setCorrect(0);
         setInCorrect(0);
         setTimeTaken(0);
+        setUseCapital(capitals);
+        setUsePunc(punctuation);
+        setText(generateText(mode, capitals, punctuation));
         //make cursor tracker to make carot and reset it here
     }
 
     //swap on click text reload for useeffect parameter update run
-    //useEffect(() => {
-    //    setText(generateText(currMode,useCapital,usePunc));
-    //},[]); 
+    useEffect(() => {
+        console.log('useeffect')
+        setText(generateText(currMode,useCapital,usePunc));
+    },[]); 
 
     //add useeffect hook to make time tracking loop and check when run is over
     useEffect(() => {
@@ -137,10 +140,10 @@ export default function TypingWindow() {
         return (
             <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
                     <div className='flex space-x-4 border-2 border-red-400'>
-                        <button className = {usePunc? 'border-2' : 'border-2 border-red-300'} onClick = {() => {setUsePunc(!usePunc); changeMode(currMode)}}> Puncuation </button>
-                        <button className = {useCapital ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {setUseCapital(!useCapital); changeMode(currMode)}}> Capitals </button>
+                        <button className = {usePunc? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(currMode, useCapital, !usePunc)}}> Puncuation </button>
+                        <button className = {useCapital ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(currMode, !useCapital, usePunc)}}> Capitals </button>
                         {modes.map(mode => (
-                            <button key = {mode} className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(mode)}}>
+                            <button key = {mode} className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(mode, useCapital, usePunc)}}>
                                 {mode}
                             </button>
                 ))}
