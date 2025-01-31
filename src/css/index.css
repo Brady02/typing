@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .theme-raisin {
+        background-color: #221D23;
+        color: #F092DD;
+    }
+    .correct {
+        opacity: 0.5;
+    }
+    .incorrect {
+        color: #F40000;
+    }
+    .caret {
+        border-left-width: 2px;
+    }
+}

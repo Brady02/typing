@@ -41,17 +41,17 @@ export default function TypingWindow() {
             }
 
             if (typedChar === currChar) {
-                chars[charIndex].classList.remove('border-l-4');
+                chars[charIndex].classList.remove('caret');
                 setCorrect(correct + 1)
-                chars[charIndex].classList.add('text-lime-500');
+                chars[charIndex].classList.add('correct');
                 setCharIndex(charIndex + 1);
-                if (charIndex < chars.length-1) {chars[charIndex+1].classList.add('border-l-4');}
+                if (charIndex < chars.length-1) {chars[charIndex+1].classList.add('caret');}
             } else if (typedChar !== currChar) {
-                chars[charIndex].classList.remove('border-l-4');
+                chars[charIndex].classList.remove('caret');
                 setInCorrect(inCorrect + 1);
-                chars[charIndex].classList.add('text-rose-600');
+                chars[charIndex].classList.add('incorrect');
                 setCharIndex(charIndex + 1);
-                if (charIndex < chars.length-1) {chars[charIndex+1].classList.add('border-l-4');}
+                if (charIndex < chars.length-1) {chars[charIndex+1].classList.add('caret');}
             }
 
             if (charIndex === chars.length - 1 && typedChar !== 'Backspace') {
@@ -67,17 +67,17 @@ export default function TypingWindow() {
         //let typedChar = event.key;
         if (charIndex < chars.length) {
             if (keyDown === 'Backspace' && charIndex !== 0) {
-                chars[charIndex].classList.remove('border-l-4');
-                chars[charIndex-1].classList.add('border-l-4');
-                if (chars[charIndex-1].classList.contains('text-lime-500') && charIndex > 0) {
-                    chars[charIndex-1].classList.remove('text-lime-500');
+                chars[charIndex].classList.remove('caret');
+                chars[charIndex-1].classList.add('caret');
+                if (chars[charIndex-1].classList.contains('correct') && charIndex > 0) {
+                    chars[charIndex-1].classList.remove('correct');
                     setCharIndex(charIndex - 1);
-                } else if (chars[charIndex-1].classList.contains('text-rose-600') && charIndex > 0) {
-                    chars[charIndex-1].classList.remove('text-rose-600');
+                } else if (chars[charIndex-1].classList.contains('incorrect') && charIndex > 0) {
+                    chars[charIndex-1].classList.remove('incorrect');
                     setCharIndex(charIndex - 1);
                 }
             } else if (keyDown === 'Enter') {
-                changeMode(currMode);
+                changeMode(currMode,useCapital,usePunc,useSymbol);
             } 
         }
     }
@@ -95,10 +95,10 @@ export default function TypingWindow() {
     const changeMode = (mode, capitals, punctuation, symbol) => {
         if (!testComplete) {
             const charsClear = document.querySelectorAll('.char');
-            charsClear[charIndex].classList.remove('border-l-4')
+            charsClear[charIndex].classList.remove('caret')
             for (let i = 0; i < charIndex; i++) {
-                if (charsClear[i].classList.contains('text-lime-500')) {charsClear[i].classList.remove('text-lime-500');}
-                if (charsClear[i].classList.contains('text-rose-600')) {charsClear[i].classList.remove('text-rose-600');}
+                if (charsClear[i].classList.contains('correct')) {charsClear[i].classList.remove('correct');}
+                if (charsClear[i].classList.contains('incorrect')) {charsClear[i].classList.remove('incorrect');}
             }
             inputRef.current.focus();
         }
@@ -140,19 +140,19 @@ export default function TypingWindow() {
     //make mode changer a function that resets everything when you change mode
     if (!testComplete) {
         return (
-            <div className='flex flex-col min-h-screen justify-evenly items-center border-2 border-red-300'>
-                    <div className='flex space-x-4 border-2 border-red-400'>
-                        <button className = {useSymbol? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(currMode, useCapital, usePunc, !useSymbol)}}> Symbols </button>
-                        <button className = {usePunc? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(currMode, useCapital, !usePunc, useSymbol)}}> Puncuation </button>
-                        <button className = {useCapital ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(currMode, !useCapital, usePunc, useSymbol)}}> Capitals </button>
+            <div className='flex flex-col flex-wrap min-h-screen justify-evenly items-center'>
+                    <div className='flex space-x-4'>
+                        <button className = {`bg-white bg-opacity-0 px-1 rounded-2xl hover:mix-blend-difference  ${useSymbol? 'mix-blend-difference outline bg-opacity-5': ''}`} onClick = {() => {changeMode(currMode, useCapital, usePunc, !useSymbol)}}> Symbols </button>
+                        <button className = {`bg-white bg-opacity-0 px-1 rounded-2xl hover:mix-blend-difference ${usePunc? 'mix-blend-difference outline bg-opacity-5' : ''}`} onClick = {() => {changeMode(currMode, useCapital, !usePunc, useSymbol)}}> Puncuation </button>
+                        <button className = {`bg-white bg-opacity-0 px-1 rounded-2xl hover:mix-blend-difference ${useCapital ? 'mix-blend-difference outline bg-opacity-5' : ''}`} onClick = {() => {changeMode(currMode, !useCapital, usePunc, useSymbol)}}> Capitals </button>
                         {modes.map(mode => (
-                            <button key = {mode} className = {active === mode ? 'border-2' : 'border-2 border-red-300'} onClick = {() => {changeMode(mode, useCapital, usePunc)}}>
+                            <button key = {mode} className = {`bg-white bg-opacity-0 px-1 rounded-2xl hover:mix-blend-difference  ${active === mode ? 'mix-blend-difference outline bg-opacity-5' : ''}`} onClick = {() => {changeMode(mode, useCapital, usePunc)}}>
                                 {mode}
                             </button>
                 ))}
             </div>
 
-            <div className='flex-initial max-w-5xl border-2 border-red-300' onClick = {() => {inputRef.current.focus()}}>
+            <div className='flex-initial max-w-5xl' onClick = {() => {inputRef.current.focus()}}>
                 {Array.from(text).map((letter,index) => (
                     <span
                     key = {index}
