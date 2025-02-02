@@ -152,11 +152,11 @@ export default function TypingWindow() {
                 ))}
             </div>
 
-            <div className='flex-initial max-w-5xl' onClick = {() => {inputRef.current.focus()}}>
+            <div className='flex-initial max-w-5xl text-3xl' onClick = {() => {inputRef.current.focus()}}>
                 {Array.from(text).map((letter,index) => (
                     <span
                     key = {index}
-                    className = {`char ${index === 0 ? 'active': ''}`}
+                    className = {`char ml-[2px] ${index === 0 ? 'active': ''}`}
                     >
                         {letter}
                     </span>
